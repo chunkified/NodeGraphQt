@@ -17,39 +17,19 @@ Navigation
 | Pan           | *Alt + LMB + Drag* or *MMB + Drag*           |
 +---------------+----------------------------------------------+
 
-Tab Search
-==========
+Node Search
+===========
 
 .. image:: _images/node_search.png
     :width: 269px
 
 Node can be created with the tab node search widget.
 
-+-------------+--------+
-| action      | hotkey |
-+=============+========+
-| Show Search | *Tab*  |
-+-------------+--------+
-
-.. note::
-    To override the tab search widget hotkey see :class:`NodeGraphQt.NodeGraph` class for the tab_search_key argument.
-
-
-Properties Bin
-==============
-
-.. image:: _images/prop_bin.png
-    :width: 950px
-
-
-Menu Setup
-==========
-
-The NodeGraphQt has a ``setup_context_menu`` method that'll setup the node graphs with basic menus and commands.
-
-`(see line:32 in the example code below)`
-
-see also: :ref:`Menu & Commands`
++-------------------+--------+
+| action            | hotkey |
++===================+========+
+| Toggle Visibility | *Tab*  |
++-------------------+--------+
 
 
 Example
@@ -68,10 +48,10 @@ example code:
     import sys
     from PySide2 import QtWidgets
 
-    from NodeGraphQt import NodeGraph, Node, setup_context_menu
+    from NodeGraphQt import NodeGraph, BaseNode, setup_context_menu
 
 
-    class FooNode(Node):
+    class FooNode(BaseNode):
 
         # unique node identifier domain.
         __identifier__ = 'com.chantasticvfx'

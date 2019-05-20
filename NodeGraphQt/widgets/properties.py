@@ -4,6 +4,7 @@ from collections import defaultdict
 from NodeGraphQt import QtWidgets, QtCore, QtGui
 from NodeGraphQt.constants import (NODE_PROP_QLABEL,
                                    NODE_PROP_QLINEEDIT,
+                                   NODE_PROP_QTEXTEDIT,
                                    NODE_PROP_QCOMBO,
                                    NODE_PROP_QCHECKBOX,
                                    NODE_PROP_QSPINBOX,
@@ -260,6 +261,7 @@ class PropSpinBox(QtWidgets.QSpinBox):
 WIDGET_MAP = {
     NODE_PROP_QLABEL:       PropLabel,
     NODE_PROP_QLINEEDIT:    PropLineEdit,
+    NODE_PROP_QTEXTEDIT:    PropLineEdit,
     NODE_PROP_QCOMBO:       PropComboBox,
     NODE_PROP_QCHECKBOX:    PropCheckBox,
     NODE_PROP_QSPINBOX:     PropSpinBox,
@@ -329,7 +331,7 @@ class NodePropWidget(QtWidgets.QWidget):
 
     Args:
         parent:
-        node (NodeGraphQt.Node): node.
+        node (NodeGraphQt.BaseNode): node.
     """
 
     #: signal (node_id, prop_name, prop_value)
@@ -394,7 +396,7 @@ class NodePropWidget(QtWidgets.QWidget):
         Populate widget from a node.
 
         Args:
-            node (NodeGraphQt.Node): node class.
+            node (NodeGraphQt.BaseNode): node class.
         """
         model = node.model
         graph_model = node.graph.model
@@ -417,8 +419,10 @@ class NodePropWidget(QtWidgets.QWidget):
             prop_window = self.__tab_windows[tab]
             for prop_name, value in tab_mapping[tab]:
                 wid_type = model.get_widget_type(prop_name)
-                WidClass = WIDGET_MAP.get(wid_type)
+                if wid_type == 0:
+                    continue
 
+                WidClass = WIDGET_MAP.get(wid_type)
                 widget = WidClass()
                 if prop_name in common_props.keys():
                     if 'items' in common_props[prop_name].keys():
@@ -508,10 +512,10 @@ class NodePropWidget(QtWidgets.QWidget):
 
 if __name__ == '__main__':
     import sys
-    from NodeGraphQt import Node, NodeGraph
+    from NodeGraphQt import BaseNode, NodeGraph
 
 
-    class TestNode(Node):
+    class TestNode(BaseNode):
 
         NODE_NAME = 'test node'
 

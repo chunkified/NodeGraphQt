@@ -3,14 +3,17 @@
 import os
 import sys
 
-from NodeGraphQt import NodeGraph, Node, Backdrop, setup_context_menu
+from NodeGraphQt import (NodeGraph,
+                         BaseNode,
+                         BackdropNode,
+                         setup_context_menu)
 from NodeGraphQt import QtWidgets, QtCore
 
 # import example nodes from the "example_nodes" package
 from example_nodes import basic_nodes, widget_nodes
 
 
-class MyNode(Node):
+class MyNode(BaseNode):
     """
     example test node.
     """
@@ -44,19 +47,28 @@ if __name__ == '__main__':
     viewer.resize(1100, 800)
     viewer.show()
 
+
     # show the properties bin when a node is "double clicked" in the graph.
     properties_bin = graph.properties_bin()
     properties_bin.setWindowFlags(QtCore.Qt.Tool)
-
     def show_prop_bin(node):
         if not properties_bin.isVisible():
             properties_bin.show()
-
     graph.node_double_clicked.connect(show_prop_bin)
+
+
+    # show the nodes list when a node is "double clicked" in the graph.
+    node_tree = graph.nodes_tree()
+    def show_nodes_list(node):
+        if not node_tree.isVisible():
+            node_tree.update()
+            node_tree.show()
+    graph.node_double_clicked.connect(show_nodes_list)
+
 
     # registered nodes.
     reg_nodes = [
-        Backdrop, MyNode,
+        BackdropNode, MyNode,
         basic_nodes.FooNode,
         basic_nodes.BarNode,
         widget_nodes.DropdownMenuNode,
@@ -104,5 +116,6 @@ if __name__ == '__main__':
     foo_node.set_output(0, bar_node.input(2))
     menu_node.set_input(0, bar_node.output(1))
     bar_node.set_input(0, text_node.output(0))
+
 
     app.exec_()

@@ -7,7 +7,7 @@ from NodeGraphQt.base.model import PortModel
 
 class Port(object):
     """
-    base class for a :class:`NodeGraphQt.Node` port.
+    base class for a node port.
 
     Args:
         node (NodeGraphQt.NodeObject): parent node.
@@ -20,7 +20,7 @@ class Port(object):
 
     def __repr__(self):
         port = str(self.__class__.__name__)
-        return 'NodeGraphQt.{}(\'{}\')'.format(port, self.name())
+        return '<{}("{}") object at {}>'.format(port, self.name(), hex(id(self)))
 
     @property
     def view(self):

@@ -50,6 +50,9 @@ class PropertiesList(QtWidgets.QTableWidget):
 
 
 class PropertiesBinWidget(QtWidgets.QWidget):
+    """
+    Node properties bin for displaying properties.
+    """
 
     #: Signal emitted (node_id, prop_name, prop_value)
     property_changed = QtCore.Signal(str, str, object)
@@ -79,6 +82,9 @@ class PropertiesBinWidget(QtWidgets.QWidget):
         layout.addLayout(top_layout)
         layout.addWidget(self._prop_list, 1)
 
+    def __repr__(self):
+        return '<{} object at {}>'.format(self.__class__.__name__, hex(id(self)))
+
     def __on_prop_close(self, node_id):
         items = self._prop_list.findItems(node_id, QtCore.Qt.MatchExactly)
         [self._prop_list.removeRow(i.row()) for i in items]
@@ -97,12 +103,21 @@ class PropertiesBinWidget(QtWidgets.QWidget):
         """
         return int(self._limit.value())
 
+    def set_limit(self, limit):
+        """
+        Set limit of nodes to display.
+
+        Args:
+            limit (int): node limit.
+        """
+        self._limit.setValue(limit)
+
     def add_node(self, node):
         """
         Add node to the properties bin.
 
         Args:
-            node (NodeGraphQt.Node): node object.
+            node (NodeGraphQt.NodeObject): node object.
         """
         if self.limit() == 0:
             return
@@ -130,7 +145,7 @@ class PropertiesBinWidget(QtWidgets.QWidget):
         Remove node from the properties bin.
 
         Args:
-            node (NodeGraphQt.Node): node object.
+            node (NodeGraphQt.BaseNode): node object.
         """
         self.__on_prop_close(node.id)
 
@@ -145,7 +160,7 @@ class PropertiesBinWidget(QtWidgets.QWidget):
         Returns the node property widget.
 
         Args:
-            node (NodeGraphQt.Node): node object.
+            node (NodeGraphQt.NodeObject): node object.
 
         Returns:
             NodePropWidget: node property widget.
@@ -158,7 +173,7 @@ class PropertiesBinWidget(QtWidgets.QWidget):
 
 if __name__ == '__main__':
     import sys
-    from NodeGraphQt import Node, NodeGraph
+    from NodeGraphQt import BaseNode, NodeGraph
     from NodeGraphQt.constants import (NODE_PROP_QLABEL,
                                        NODE_PROP_QLINEEDIT,
                                        NODE_PROP_QCOMBO,
@@ -167,7 +182,7 @@ if __name__ == '__main__':
                                        NODE_PROP_SLIDER)
 
 
-    class TestNode(Node):
+    class TestNode(BaseNode):
         NODE_NAME = 'test node'
 
         def __init__(self):

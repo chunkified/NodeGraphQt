@@ -4,6 +4,7 @@ from NodeGraphQt.base.model import NodeModel
 from NodeGraphQt.base.port import Port
 from NodeGraphQt.constants import (NODE_PROP,
                                    NODE_PROP_QLINEEDIT,
+                                   NODE_PROP_QTEXTEDIT,
                                    NODE_PROP_QCOMBO,
                                    NODE_PROP_QCHECKBOX,
                                    IN_PORT, OUT_PORT)
@@ -29,34 +30,35 @@ class NodeObject(object):
     base class for all node objects.
 
     Args:
-        node (AbstractNodeItem): graphic item used for drawing.
+        qgraphics_item (AbstractNodeItem): graphic item used for drawing.
     """
 
-    #: unique node identifier domain.
+    #: (str) unique node identifier domain.
     __identifier__ = 'nodeGraphQt.nodes'
 
-    #: initial default node name.
+    #: (str) base node name.
     NODE_NAME = None
 
-    def __init__(self, node=None):
-        assert node, 'node cannot be None.'
+    def __init__(self, qgraphics_item=None):
+        assert qgraphics_item, 'qgraphics item cannot be None.'
         self._graph = None
         self._model = NodeModel()
         self._model.type_ = self.type_
         self._model.name = self.NODE_NAME
-        self._view = node
+        self._view = qgraphics_item
         self._view.type_ = self.type_
         self._view.name = self.model.name
         self._view.id = self._model.id
 
     def __repr__(self):
-        return '{}(\'{}\')'.format(self.type_, self.NODE_NAME)
+        return '<{}("{}") object at {}>'.format(
+            self.__class__.__name__, self.NODE_NAME, hex(id(self)))
 
     @classproperty
     def type_(cls):
         """
         Node type identifier followed by the class name.
-        eg. com.chantasticvfx.MyNode
+        eg. nodeGraphQt.nodes.MyNode
 
         Returns:
             str: node type.
@@ -351,7 +353,7 @@ class NodeObject(object):
         return self.model.pos
 
 
-class Node(NodeObject):
+class BaseNode(NodeObject):
     """
     base class of a typical Node with input and output ports.
     """
@@ -359,7 +361,7 @@ class Node(NodeObject):
     NODE_NAME = 'Base Node'
 
     def __init__(self):
-        super(Node, self).__init__(NodeItem())
+        super(BaseNode, self).__init__(NodeItem())
         self._inputs = []
         self._outputs = []
 
@@ -562,7 +564,7 @@ class Node(NodeObject):
         src_port.connect_to(port)
 
 
-class Backdrop(NodeObject):
+class BackdropNode(NodeObject):
     """
     base class of a Backdrop node.
     """
@@ -570,10 +572,11 @@ class Backdrop(NodeObject):
     NODE_NAME = 'Backdrop'
 
     def __init__(self):
-        super(Backdrop, self).__init__(BackdropNodeItem())
+        super(BackdropNode, self).__init__(BackdropNodeItem())
         # override base default color.
         self.model.color = (5, 129, 138, 255)
-        self.create_property('bg_text', '')
+        self.create_property('backdrop_text', '',
+                             widget_type=NODE_PROP_QTEXTEDIT, tab='Backdrop')
 
     def auto_size(self):
         """
@@ -586,7 +589,7 @@ class Backdrop(NodeObject):
         Returns nodes wrapped within the backdrop node.
 
         Returns:
-            list[NodeGraphQt.Node]: list of node under the backdrop.
+            list[NodeGraphQt.BaseNode]: list of node under the backdrop.
         """
         node_ids = [n.id for n in self.view.get_nodes()]
         return [self.graph.get_node_by_id(nid) for nid in node_ids]
